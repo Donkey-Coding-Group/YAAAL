@@ -1,1 +1,6 @@
-AWESEOME VALA FILE
+
+void main() {
+	
+	stdout.printf("AWESEOME VALA FILE \n");
+		
+}
