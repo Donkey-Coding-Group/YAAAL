@@ -1,0 +1,118 @@
+.tl, .textLeft {
+  text-align: left; 
+
+}
+
+.tr, .textRight {
+  text-align: right; 
+}
+
+.tc, .textCenter {
+  text-align: center; 
+}
+
+.tj, .justify {
+  text-align: justify; 
+}
+
+.bold, .b {
+  font-weight: bold; 
+}
+
+.italic, .i {
+  font-style: italic; 
+}
+
+.strike {
+  text-decoration: line-through; 
+}
+
+.fl {
+  float: left; 
+}
+
+.fr {
+  float: right; 
+}
+
+.clear {
+  clear: both; 
+}
+
+.width20 {
+  width: 20%; 
+}
+
+.width25 {
+  width: 25%; 
+}
+
+.width30 {
+  width: 30%; 
+}
+
+.width33 {
+  width: 33.3333333%; 
+}
+
+.width40 {
+  width: 40%; 
+}
+
+.width50 {
+  width: 50%; 
+}
+
+.width60 {
+  width: 60%; 
+}
+
+.width70 {
+  width: 70%; 
+}
+
+.width75 {
+  width: 75%; 
+}
+
+.width100 {
+  width: 100%; 
+}
+
+.pad {
+  padding: 1em; 
+}
+
+.padLeft {
+  padding-left: 1em; 
+}
+
+.padRight {
+  padding-right: 1em; 
+}
+
+.padTop {
+  padding-top: 1em; 
+}
+
+.padBottom {
+  padding-bottom: 1em; 
+}
+
+.nopad, .np {
+  padding: 0; 
+}
+
+.center {
+  margin-left: auto;
+  margin-right: auto; 
+}
+
+.indent {
+  padding-left: 2em; 
+}
+
+.hidden {
+  display: none;
+  visibility: hidden; 
+}
