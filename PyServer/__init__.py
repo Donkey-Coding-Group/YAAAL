@@ -1,16 +1,13 @@
 # coding: utf-8
 # author: Niklas Rosenstein <rosensteinniklas@googlemail.com>
-""" YAAAL - Python Server for YAAAAL
+""" yaaal - Python Server for YAAAAL
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ """
 
-import server
+raise NotImplemented
 
 def main():
-    host = 'localhost'
-    port = 6150
+    print >> sys.stderr, "Not implemented."
 
-    httpd = server.YAAALServer(host, port)
-    httpd.handle_request()
-
-main()
+if __name__ == "__main__":
+    main()
 
