@@ -1,0 +1,7 @@
+
+#ignore temp files (like created by gedit)
+*~
+
+#only look at python source files
+*.pyc
+*.pyo
