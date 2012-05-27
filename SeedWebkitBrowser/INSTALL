@@ -1,0 +1,20 @@
+Of course you will need Gtk and WebKit installed
+
+
+You will need the seed javascript interpreter.
+
+############################################
+#											#
+# On Ubuntu theses packages are called:		#
+#	- gnome-js-common						#
+#	- libseed-gtk3-0						#
+#	- seed									#
+#											#
+############################################
+
+Seed may need a version of WebKitGtk
+(which should be in most repositorys)
+
+You can also get seed from Gnome's git repository
+Browse:		http://git.gnome.org/browse/seed
+Get:		git clone git://git.gnome.org/seed
