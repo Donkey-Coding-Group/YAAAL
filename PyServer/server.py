@@ -90,7 +90,7 @@ class BaseRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         elif hasattr(result, 'read'):
             result = result.read()
         else:
-            raise TypeError('This type of result is not support.')
+            raise TypeError('This type of result is not supported.')
 
         self.wfile.write(result)
 
