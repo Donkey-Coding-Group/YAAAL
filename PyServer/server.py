@@ -7,6 +7,7 @@
 import os
 import re
 import sys
+import copy
 import urllib
 import urlparse
 import traceback
@@ -14,18 +15,38 @@ import BaseHTTPServer
 
 class BaseRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     """ Public. This class implements basic high-level request-handling
-        based on regular-expressions associated with functions. """
+        based on regular-expressions associated with functions. For more
+        information, see :meth:`__init__`. """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, logging=True, make_copies=True):
+        """ Override. The constructor totally overrides the constructor of
+            the base-class and reimplements the behaviour of a request handler.
+            Instead of handling the request on initialization, which is done
+            within the base-class constructor, the ``__call__`` method is
+            implemented, which makes it possible to pass an **instance** of
+            this request-handler to a TCPServer instead of it's class.
 
+            + *logging*: Toggles logging.
+            + *make_copies*: Whether to make a copy of this instance on
+              :meth:`__call__` or not. """
         self.handlers = []
-        self.logging = True
+        self.logging = logging
+        self.make_copies = make_copies
         self.on_init()
 
-        # do_*() operations are called within __init__()
-        # that's why we call the super-method `after` we've done
-        # our initialization.
-        BaseHTTPServer.BaseHTTPRequestHandler.__init__(self, *args, **kwargs)
+
+    def __call__(self, *args, **kwargs):
+        """ This method is implemented to be able to pass an instance of a
+            request-handler to a TCPServer instead of it's class. Depending
+            on the :attr:`make_copies` slot, it creates a copy of the current
+            instance or uses the actual instance and calls the base-classes'
+            constructor. """
+        if self.make_copies:
+            new = copy.copy(self)
+        else:
+            new = self
+        BaseHTTPServer.BaseHTTPRequestHandler.__init__(new, *args, **kwargs)
+        return new
 
     #: BaseHTTPServer.BaseHTTPRequestHandler
 
@@ -188,3 +209,9 @@ class BaseRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         print
 
 
+
+def main():
+    httpd = BaseHTTPServer.HTTPServer(('', 8080), BaseRequestHandler())
+    httpd.handle_request()
+
+main()
