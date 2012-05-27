@@ -5,6 +5,15 @@
 import os
 import sys
 
+__path__ = os.path.dirname(__file__)
+DATA = os.path.join(__path__, 'data')
+
+if not os.path.exists(DATA):
+    os.mkdir(DATA)
+
+HOME = os.environ['HOME']
+APPS = '/usr/share/applications/'
+
 #: Interface that must be implemented for the platforms.
 
 def getApplications():
@@ -28,7 +37,7 @@ def getApplications():
 def setApplicationData(app_index, name, value):
     """ Set custom data for an application identified with the index
         *app_index*. *value* will be associated with *name* and retrieved either
-        via :func:`getApplications` or :func:`getApplicationData`. """
+        vgitia :func:`getApplications` or :func:`getApplicationData`. """
 
     raise NotImplemented
 
