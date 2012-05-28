@@ -7,7 +7,39 @@ import sys
 import re
 import copy
 import urlparse
+import traceback
+import cStringIO
 import BaseHTTPServer
+
+class FakedRequestHandler(object):
+    """ This class is passed to a handler-function registered to an instance
+        of :class:`RequestHandler`. The handler should use it to send the
+        response and headers. """
+
+    def __init__(self):
+        self.response = -1
+        self.headers = {}
+        self.wfile = cStringIO.StringIO()
+        self.rfile = cStringIO.StringIO()
+
+    def send_response(self, response):
+        self.response = int(response)
+
+    def send_header(self, name, value):
+        self.headers[name] = value
+
+    def end_headers(self):
+        pass
+
+    def default_response(self, code=200,
+                         headers={'Content-type': 'text/html'}):
+        """ *Public*. Send a response with *code* and *headers* to the
+            client. """
+
+        self.send_response(code)
+        for k, v in headers.iteritems():
+            self.send_header(k, v)
+        self.end_headers()
 
 class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     """ The :class:`RequestHandler` class implements matching regular
@@ -93,6 +125,12 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     #: BaseHTTPServer.BaseHTTPRequestHandler
 
+    def log_message(self, *args):
+        if not self.logging:
+            pass
+        else:
+            return BaseHTTPServer.BaseHTTPRequestHandler.log_message(self, *args)
+
     def do_GET(self):
         path = self.get_PATH()
         getvars = self.get_GET()
@@ -103,11 +141,15 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         for regex, handler in self.handlers:
             match = regex.match(path)
             if match:
+                fake_handler = FakedRequestHandler()
+
                 # Well, the regular-expression did match. But the
                 # handler-function could throw an exception, so we have to
                 # encapsulate it in try-except and handle it properly.
                 try:
-                    result = handler(self, path, getvars, postvars, match)
+                    result = handler(fake_handler, path, getvars, postvars,
+                                     match)
+                    self._proc_fake_handler(fake_handler)
                 except Exception as exc:
                     result = self.handle_exception(path, getvars, postvars, exc)
 
@@ -128,6 +170,14 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     #: RequestHandler
 
+    def _proc_fake_handler(self, fake_handler):
+        """ *Private*. Processes an instance of :class:`FakedRequestHandler` to
+            send the headers and it's content to the client. """
+
+        self.send_response(fake_handler.response)
+        for type, value in fake_handler.headers.iteritems():
+            self.send_header(type, value)
+
     def _proc_result(self, result):
         """ *Private*. Handles the result returned from a handle, either
             registered or `:meth`handle_404` or :meth:`handle_exception`. """
@@ -136,46 +186,6 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             result = result.read()
         self.wfile.write(result)
 
-    def on_init(self):
-        """ *Override*. Called on initialization of this instance. This is just
-            for convenience so one doesn't have to override :meth:`__init__`.
-            """
-
-        pass
-
-    def handle_404(self, path, GET, POST):
-        """ *Override*. This method is called in case no registered handler
-            did match with the requested path. The default implementation
-            sends a simple 404 error in HTML format. """
-
-        self.send_response(404)
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
-
-        self.wfile.write('<DOCTYPE html><html><body>' +
-            '<h1>404 Page Not Found</h1>' +
-            '<span id=msg>The requested page could not be found.' +
-            '</span></body></html>')
-
-    def handle_exception(self, path, GET, POST, exc):
-        """ *Override*. This method is called in case a registered handler
-            throws an exception, i.e. it was not implemented properly. The
-            default implementation shows a simple 501 error in HTML format
-            and prints the exception. """
-
-        self.send_response(501)
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
-
-        self.wfile.write('<DOCTYPE html><html><body>' +
-            '<h1>501 Internal Server Error</h1>' +
-            '<span id=msg>An error occurred, please contact the domain-host.' +
-            '</span></body></html>')
-
-        print >> sys.stderr
-        print >> sys.stderr, traceback.format_exc()
-        print >> sys.stderr
-
     def add_handler(self, regex, handler, flags=0):
         """ *Public*. Associate a regular-expression passed via *regex* with a
             function *handler*. One can specify flags to the compilation of
@@ -183,7 +193,7 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
             Such a function has to take 5 arguments:
 
-            1. The request-handler
+            1. An instance of :class:`FakedRequestHandler`
             2. The request-URI (without GET)
             3. GET-vars
             4. POST-vars
@@ -195,7 +205,16 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             or a file-like object. If the latter is returned, it's ``close()``
             method is not called.
 
-            Raises ``TypeError`` in case *handler* is not callable. """
+            Raises ``TypeError`` in case *handler* is not callable.
+
+            .. note::
+
+                The request-handler is not passed directly to a handler,
+                because it can lead to (to the (api-) user) fatal errors when
+                a response and headers have already been sent and an exception
+                occures afterwards. :meth:`handle_exception` would then send
+                a response and headers again and this text would be sent with
+                the content of the error-message. """
 
         if not hasattr(handler, '__call__'):
             raise TypeError('handler is not callable.')
@@ -237,15 +256,47 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             request_uri = request_uri[:index]
         return request_uri
 
-    def default_response(self, code=200,
-                         headers={'Content-type': 'text/html'}):
-        """ *Public*. Send a response with *code* and *headers* to the
-            client. """
+    def on_init(self):
+        """ *Override*. Called on initialization of this instance. This is just
+            for convenience so one doesn't have to override :meth:`__init__`.
+            """
 
-        self.send_response(code)
-        for k, v in headers.iteritems():
-            self.send_header(k, v)
+        pass
+
+    def handle_404(self, path, GET, POST):
+        """ *Override*. This method is called in case no registered handler
+            did match with the requested path. The default implementation
+            sends a simple 404 error in HTML format. """
+
+        self.send_response(404)
+        self.send_header('Content-type', 'text/html')
         self.end_headers()
+
+        self.wfile.write('<DOCTYPE html><html><body>' +
+            '<h1>404 Page Not Found</h1>' +
+            '<span id=msg>The requested page could not be found.' +
+            '</span></body></html>')
+
+    def handle_exception(self, path, GET, POST, exc):
+        """ *Override*. This method is called in case a registered handler
+            throws an exception, i.e. it was not implemented properly. The
+            default implementation shows a simple 500 error in HTML format
+            and prints the exception. """
+
+        print "fooooooooo"
+
+        self.send_response(500)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+
+        self.wfile.write('<DOCTYPE html><html><body>' +
+            '<h1>500 Internal Server Error</h1>' +
+            '<span id=msg>An error occurred, please contact the domain-host.' +
+            '</span></body></html>')
+
+        print >> sys.stderr
+        print >> sys.stderr, traceback.format_exc()
+        print >> sys.stderr
 
 
 def handle(req, path, GET, POST, match):
@@ -254,7 +305,7 @@ def handle(req, path, GET, POST, match):
     return "Hallo Carina!"
 
 def main():
-    handler = RequestHandler()
+    handler = RequestHandler(logging=True)
     handler.add_handler('.*', handle)
     httpd = BaseHTTPServer.HTTPServer(('', 8080), handler)
     httpd.handle_request()
