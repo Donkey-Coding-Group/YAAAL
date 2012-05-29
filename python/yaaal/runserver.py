@@ -29,7 +29,40 @@ sys.path.insert(0, os.path.join(__path__, 'libs'))
 
 import yaaal
 import yaaal.util
+import yaaal.request_handler
 import config
+
+class YAAALRequestHandler(yaaal.RequestHandler):
+    """ This class implements grabbing handlers from the configuration-file. """
+
+    def on_init(self):
+        self.add_handlers(config.HANDLERS)
+        config.HANDLERS = self.handlers
+
+    def handle_404(self, path, GET, POST):
+        if config.HANDLE_404:
+            request_o = yaaal.request_handler.Request(path, GET, POST, None)
+            request_o.response = 404
+            result = config.HANDLE_404(request_o)
+            self._proc_request_object(request_o)
+            return result
+        else:
+            return yaaal.RequestHandler.handle_404(self, path, GET, POST)
+
+    def handle_exception(self, path, GET, POST, exc):
+        if config.HANDLE_EXCEPTION:
+            request_o = yaaal.request_handler.Request(path, GET, POST, None)
+            request_o.response = 500
+            result = config.HANDLE_EXCEPTION(request_o, exc)
+            if request_o.invoked_404:
+                return self.handle_404(path, GET, POST)
+            else:
+                self._proc_request_object(request_o)
+            return result
+        else:
+            return yaaal.RequestHandler.handle_exception(self, path, GET, POST,
+                                                         exc)
+
 
 def main():
     parser = argparse.ArgumentParser(description='Run the YAAAL Server.')
@@ -71,12 +104,10 @@ def main():
         handler.setLevel(level)
         logger.setLevel(level)
 
-    handler = yaaal.RequestHandler(logger)
-    handler.add_handlers(config.HANDLERS)
-
+    handler = YAAALRequestHandler(logger)
     httpd = BaseHTTPServer.HTTPServer(('', args.port), handler)
-
     httpd.serve_forever()
+
     return 0
 
 if __name__ == "__main__":

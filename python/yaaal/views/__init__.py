@@ -15,10 +15,52 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-def index_page(request):
-    return "Welcome to the index page."
+from __main__ import __file__
+
+import os
+import logging
+
+__path__ = os.path.dirname(__file__)
+
+def request_file(request):
+    """ *View*. Sends a file to the client. The match-object must contain
+        the file-name in it's second group. """
+
+    filename = request.match.group(1)
+    filename = os.path.join(__path__, 'res', filename)
+
+    if not os.path.exists(filename) or not os.path.isfile(filename):
+        request.invoke_404()
+        return
+
+    suffix = filename.rfind('.')
+    if suffix >= 0:
+        suffix = filename[suffix + 1:]
+    else:
+        suffix = None
+
+    mime = None
+    if suffix in 'css js html htm svg'.split():
+        mime = 'text/%s' % suffix
+    elif suffix in 'txt '.split():
+        mime = 'text/plain'
+    elif suffix in 'jpg jpeg png tif tiff gif':
+        mime = 'image/%s' % suffix
+    else:
+        mime = 'file/%s' % suffix
+
+    if mime:
+        request.headers['Content-type'] = mime
+
+    with open(filename) as fl:
+        return fl.read()
+
+def index(request):
+    return "<html><body><h1>Welcome!</h1></body></html>"
+
+def error(*args):
+    raise Exception
 
 
-def api_page(request):
-    return "This is the api-page."
+
 

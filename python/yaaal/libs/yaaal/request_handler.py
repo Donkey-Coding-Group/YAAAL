@@ -55,6 +55,12 @@ class Request(object):
             with a handler against the request-path. One may obtain data from
             it. :)
 
+        .. attribute:: logger
+
+            This slot contains the logger that is used by the request-handler.
+            One can optionally put logging messages into handler-functions by
+            using the :meth:`log` function.
+
         .. attribute:: response
 
             The value of this slot is sent to the client after the
@@ -67,7 +73,7 @@ class Request(object):
             to ``text/html``.
         """
 
-    def __init__(self, path, GET, POST, match):
+    def __init__(self, path, GET, POST, match, logger=None):
         """ *Constructor*. See the :class:`class-description<Request>` for more
             info about the arguments. """
 
@@ -75,8 +81,22 @@ class Request(object):
         self.GET  = GET
         self.POST = POST
         self.match = match
+        self.logger = logger
         self.response = 200
         self.headers = {'Content-type': 'text/html'}
+        self.invoked_404 = False
+
+    def invoke_404(self):
+        """ *Public.* A handler-function can call this method to tell the
+            request-handler that :meth:`RequestHandler.handle_404` should be
+            invoked rather than the answer to this request. """
+        self.invoked_404 = True
+
+    def log(self, message, level=logging.DEBUG):
+        """ *Public*. Log a message to the request-handlers logger. The
+            default level is :attr:`logging.DEBUG`. """
+        if self.logger:
+            self.logger.log(level, message)
 
 class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     """ The :class:`RequestHandler` class implements matching regular
@@ -185,21 +205,25 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         for regex, handler in self.handlers:
             match = regex.match(path)
             if match:
-                request_o = Request(path, getvars, postvars, match)
+                request_o = Request(path, getvars, postvars, match,
+                                    self.logger)
 
                 # Well, the regular-expression did match. But the
                 # handler-function could throw an exception, so we have to
                 # encapsulate it in try-except and handle it properly.
                 try:
                     result = handler(request_o)
-                    self._proc_request_object(request_o)
+                    if request_o.invoked_404:
+                        result = self.handle_404(path, getvars, postvars)
+                    else:
+                        self._proc_request_object(request_o)
                 except Exception as exc:
                     result = self.handle_exception(path, getvars, postvars, exc)
 
                 if result:
                     self._proc_result(result)
 
-                return True
+                return not request_o.invoked_404
 
         # Seems like no handler did match the requested path ...
         result = self.handle_404(path, getvars, postvars)
