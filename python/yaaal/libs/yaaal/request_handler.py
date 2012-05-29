@@ -350,19 +350,3 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         self.log_error(full_msg)
 
 
-def handle(req, path, GET, POST, match):
-    req.default_response()
-
-    if 'foobar' in GET:
-        return "So you think your foobar is %s?!" % GET['foobar'][0]
-
-    return "GitHub is awesome."
-
-def main():
-    handler = RequestHandler()
-    handler.add_handler('.*', handle)
-    httpd = BaseHTTPServer.HTTPServer(('', 8080), handler)
-    httpd.handle_request()
-
-main()
-
