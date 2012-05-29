@@ -44,8 +44,12 @@ class FakedRequestHandler(object):
         + ``wfile`` *attribute*
         """
 
-    def __init__(self):
-        self.response = -1
+    def __init__(self, path, GET, POST, match):
+        self.path = path
+        self.GET = GET
+        self.POST = POST
+        self.match = match
+        self.response = 200
         self.headers = {}
         self.wfile = cStringIO.StringIO()
 
@@ -125,6 +129,8 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             list directly.
         """
 
+    default_contenttype = 'text/html'
+
     def __init__(self, logger=stderr_logger, make_copies=True):
         """ Constructor. See the attributes of this class to get a clue of what
             arguments this constructor expects. """
@@ -177,14 +183,14 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         for regex, handler in self.handlers:
             match = regex.match(path)
             if match:
-                fake_handler = FakedRequestHandler()
+                fake_handler = FakedRequestHandler(path, getvars, postvars,
+                                                   match)
 
                 # Well, the regular-expression did match. But the
                 # handler-function could throw an exception, so we have to
                 # encapsulate it in try-except and handle it properly.
                 try:
-                    result = handler(fake_handler, path, getvars, postvars,
-                                     match)
+                    result = handler(fake_handler)
                     self._proc_fake_handler(fake_handler)
                 except Exception as exc:
                     result = self.handle_exception(path, getvars, postvars, exc)
@@ -215,6 +221,9 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         for type, value in fake_handler.headers.iteritems():
             self.send_header(type, value)
 
+        if 'Content-type' not in fake_handler.headers:
+            self.send_header('Content-type', self.default_contenttype)
+
         self.end_headers()
 
         fake_handler.wfile.seek(0)
@@ -234,13 +243,10 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             function *handler*. One can specify flags to the compilation of
             the regular-expressions via *flags*.
 
-            Such a function has to take 5 arguments:
-
-            1. An instance of :class:`FakedRequestHandler`
-            2. The request-URI (without GET)
-            3. GET-vars
-            4. POST-vars
-            5. The match returned by the regular expression
+            A hanlder-function takes an instance of :class:`FakedRequestHandler`
+            as a single argument. It contains the request-path, GET- and
+            POST-vars, as well as the :class:`re._SRE_Match` instance that
+            matched the regular expression.
 
             The response and it's headers must be sent via the request-handler
             instance. After that, one can either write directly to
