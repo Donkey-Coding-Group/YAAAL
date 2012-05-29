@@ -29,6 +29,7 @@ class MultilineFormatter(logging.Formatter):
         str = logging.Formatter.format(self, record)
         if not record.message:
             return str
+
         header, footer = str.split(record.message)
         str = str.replace('\n', '\n%s' % (' ' * len(header)))
         return str

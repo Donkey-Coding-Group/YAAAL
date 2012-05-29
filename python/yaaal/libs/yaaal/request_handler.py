@@ -30,49 +30,53 @@ import BaseHTTPServer
 import util
 stderr_logger = util.stderr_logger()
 
-class FakedRequestHandler(object):
-    """ This class is passed to a handler-function registered to an instance
-        of :class:`RequestHandler`. The handler should use it to send the
-        response and headers.
+class Request(object):
+    """ An instance of this class is passed when a handler-function is called.
+        It contains the request-path, GET- and POSTvars and the match-object
+        returned by the matching regular-expression.
 
-        It supports the following methods and and attributes that are normally
-        accessed via the original request-handler:
+        .. attribute:: path
 
-        + ``send_response(int response)`` *method*
-        + ``send_header(str name, str value)`` *method*
-        + ``end_headers()`` *method*
-        + ``wfile`` *attribute*
+            The request-path without GET appendum.
+
+        .. attribute:: GET
+
+            A dictionary of GET-variables passed to the request. GET vars
+            are always lists of values (that's how they are returned by
+            :func:`urlparse.parse_qs``).
+
+        .. attribute:: POST
+
+            A dictionary of POST-variables passed to the request.
+
+        .. attribute:: match
+
+            The object returned by matching the regular-expression associated
+            with a handler against the request-path. One may obtain data from
+            it. :)
+
+        .. attribute:: response
+
+            The value of this slot is sent to the client after the
+            handler-function ended. It is ``200`` by default.
+
+        .. attribute:: headers
+
+            After the handler-functions has ended, all headers in this dicionary
+            are sent to the client. The ``Content-type`` key is set by default
+            to ``text/html``.
         """
 
     def __init__(self, path, GET, POST, match):
+        """ *Constructor*. See the :class:`class-description<Request>` for more
+            info about the arguments. """
+
         self.path = path
-        self.GET = GET
+        self.GET  = GET
         self.POST = POST
         self.match = match
         self.response = 200
-        self.headers = {}
-        self.wfile = cStringIO.StringIO()
-
-    #: FakedRequestHandler
-
-    def send_response(self, response):
-        self.response = int(response)
-
-    def send_header(self, name, value):
-        self.headers[name] = value
-
-    def end_headers(self):
-        pass
-
-    def default_response(self, code=200,
-                         headers={'Content-type': 'text/html'}):
-        """ *Public*. Send a response with *code* and *headers* to the
-            client. """
-
-        self.send_response(code)
-        for k, v in headers.iteritems():
-            self.send_header(k, v)
-        self.end_headers()
+        self.headers = {'Content-type': 'text/html'}
 
 class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     """ The :class:`RequestHandler` class implements matching regular
@@ -129,8 +133,6 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             list directly.
         """
 
-    default_contenttype = 'text/html'
-
     def __init__(self, logger=stderr_logger, make_copies=True):
         """ Constructor. See the attributes of this class to get a clue of what
             arguments this constructor expects. """
@@ -183,15 +185,14 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         for regex, handler in self.handlers:
             match = regex.match(path)
             if match:
-                fake_handler = FakedRequestHandler(path, getvars, postvars,
-                                                   match)
+                request_o = Request(path, getvars, postvars, match)
 
                 # Well, the regular-expression did match. But the
                 # handler-function could throw an exception, so we have to
                 # encapsulate it in try-except and handle it properly.
                 try:
-                    result = handler(fake_handler)
-                    self._proc_fake_handler(fake_handler)
+                    result = handler(request_o)
+                    self._proc_request_object(request_o)
                 except Exception as exc:
                     result = self.handle_exception(path, getvars, postvars, exc)
 
@@ -213,21 +214,14 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     #: RequestHandler
 
-    def _proc_fake_handler(self, fake_handler):
-        """ *Private*. Processes an instance of :class:`FakedRequestHandler` to
-            send the headers and it's content to the client. """
+    def _proc_request_object(self, instance):
+        """ *Private*. Processes an instance of :class:`Request` to
+            send the response and headers to the client. """
 
-        self.send_response(fake_handler.response)
-        for type, value in fake_handler.headers.iteritems():
+        self.send_response(instance.response)
+        for type, value in instance.headers.iteritems():
             self.send_header(type, value)
-
-        if 'Content-type' not in fake_handler.headers:
-            self.send_header('Content-type', self.default_contenttype)
-
         self.end_headers()
-
-        fake_handler.wfile.seek(0)
-        self.wfile.write(fake_handler.wfile.read())
 
     def _proc_result(self, result):
         """ *Private*. Handles the result returned from a handle, either

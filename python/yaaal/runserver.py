@@ -62,7 +62,7 @@ def main():
         else:
             handler = logging.FileHandler(args.log_file)
 
-        formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+        formatter = yaaal.util.MultilineFormatter('%(asctime)s %(levelname)s %(message)s')
         handler.setFormatter(formatter)
 
         logger = logging.getLogger('yaaal-server')
