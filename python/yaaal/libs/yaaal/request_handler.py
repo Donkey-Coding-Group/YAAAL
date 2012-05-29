@@ -19,22 +19,37 @@ import os
 import sys
 
 import re
+import cgi
 import copy
+import logging
 import urlparse
 import traceback
 import cStringIO
 import BaseHTTPServer
 
+import util
+stderr_logger = util.stderr_logger()
+
 class FakedRequestHandler(object):
     """ This class is passed to a handler-function registered to an instance
         of :class:`RequestHandler`. The handler should use it to send the
-        response and headers. """
+        response and headers.
+
+        It supports the following methods and and attributes that are normally
+        accessed via the original request-handler:
+
+        + ``send_response(int response)`` *method*
+        + ``send_header(str name, str value)`` *method*
+        + ``end_headers()`` *method*
+        + ``wfile`` *attribute*
+        """
 
     def __init__(self):
         self.response = -1
         self.headers = {}
         self.wfile = cStringIO.StringIO()
-        self.rfile = cStringIO.StringIO()
+
+    #: FakedRequestHandler
 
     def send_response(self, response):
         self.response = int(response)
@@ -71,12 +86,12 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         that will influence the way the handler will work (subclasses can of
         course accept new arguments and change their behaviour likewise).
 
-        .. attribute:: logging
+        .. attribute:: logger
 
             This class overwrites the
             :meth:`BaseHTTPServer.BaseHTTPRequestHandler.log_message` method.
-            By setting this slot to ``False``, any calls to the previously
-            mentioned method will not have any effect.
+            By passing a logger to the constructor, the request-handler will log
+            messages in it. By default, it is a logger to stderr.
 
             .. note::
 
@@ -110,11 +125,11 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             list directly.
         """
 
-    def __init__(self, logging=True, make_copies=True):
+    def __init__(self, logger=stderr_logger, make_copies=True):
         """ Constructor. See the attributes of this class to get a clue of what
             arguments this constructor expects. """
 
-        self.logging = logging
+        self.logger = logger
         self.make_copies = make_copies
         self.handlers = []
 
@@ -139,16 +154,23 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     #: BaseHTTPServer.BaseHTTPRequestHandler
 
-    def log_message(self, *args):
-        if not self.logging:
-            pass
-        else:
-            return BaseHTTPServer.BaseHTTPRequestHandler.log_message(self, *args)
+    def log_message(self, format, *args):
+        if self.logger:
+            self.logger.info(format % args)
 
-    def do_GET(self):
+    def log_error(self, format, *args):
+        if self.logger:
+            self.logger.error(format % args)
+
+    def do_GET(self, postvars=None):
+        # :arg:`postvars` is passed via do_POST() as both procedures are
+        # similiar, but do_GET() will fail if it wants to obtain POST-vars.
+
         path = self.get_PATH()
         getvars = self.get_GET()
-        postvars = self.get_POST()
+
+        if postvars is None:
+            postvars = {}
 
         # Go through each registered handler and match the regular-expression
         # against the requested path.
@@ -179,8 +201,9 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
         return False
 
-    # TODO: can do_POST() be really equal to do_GET() ?
-    do_POST = do_GET
+    def do_POST(self):
+        postvars = self.get_POST()
+        return self.do_GET(postvars=postvars)
 
     #: RequestHandler
 
@@ -192,12 +215,18 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         for type, value in fake_handler.headers.iteritems():
             self.send_header(type, value)
 
+        self.end_headers()
+
+        fake_handler.wfile.seek(0)
+        self.wfile.write(fake_handler.wfile.read())
+
     def _proc_result(self, result):
         """ *Private*. Handles the result returned from a handle, either
             registered or `:meth`handle_404` or :meth:`handle_exception`. """
 
         if hasattr(result, 'read'):
             result = result.read()
+
         self.wfile.write(result)
 
     def add_handler(self, regex, handler, flags=0):
@@ -258,8 +287,18 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             return {}
 
     def get_POST(self):
-        # TODO: implement get_POST()
-        return {}
+        """ *Public*. Return the POST vars passed to the current request. """
+        # http://stackoverflow.com/questions/4233218/python-basehttprequesthandler-post-variables
+        ctype, pdict = cgi.parse_header(self.headers.getheader('Content-type'))
+        if ctype == 'multipart/form-data':
+            postvars = cgi.parse_multipart(self.rfile, pdict)
+        elif ctype == 'application/x-www-form-urlencoded':
+            length = int(self.headers.getheader('content-length'))
+            postvars = cgi.parse_qs(self.rfile.read(length), keep_blank_values=1)
+        else:
+            postvars = {}
+
+        return postvars
 
     def get_PATH(self):
         """ *Public*. Return the request path without GET-vars. """
@@ -297,8 +336,6 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             default implementation shows a simple 500 error in HTML format
             and prints the exception. """
 
-        print "fooooooooo"
-
         self.send_response(500)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
@@ -308,26 +345,24 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             '<span id=msg>An error occurred, please contact the domain-host.' +
             '</span></body></html>')
 
-        print >> sys.stderr
-        print >> sys.stderr, traceback.format_exc()
-        print >> sys.stderr
+        full_msg = 'Exception on handling request to %r.\n' % path
+        full_msg = full_msg + traceback.format_exc()
+        self.log_error(full_msg)
 
 
 def handle(req, path, GET, POST, match):
     req.default_response()
-    raise Exception
-    return "Hallo Carina!"
+
+    if 'foobar' in GET:
+        return "So you think your foobar is %s?!" % GET['foobar'][0]
+
+    return "GitHub is awesome."
 
 def main():
-    handler = RequestHandler(logging=True)
+    handler = RequestHandler()
     handler.add_handler('.*', handle)
     httpd = BaseHTTPServer.HTTPServer(('', 8080), handler)
     httpd.handle_request()
 
 main()
 
-
-
-
-
-            
