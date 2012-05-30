@@ -15,19 +15,18 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from __main__ import __file__
+from __main__ import __file__ as _file_
 
 import os
-import logging
 
-__path__ = os.path.dirname(__file__)
+_path_ = os.path.dirname(_file_)
 
 def request_file(request):
     """ *View*. Sends a file to the client. The match-object must contain
         the file-name in it's second group. """
 
     filename = request.match.group(1)
-    filename = os.path.join(__path__, 'res', filename)
+    filename = os.path.join(_path_, 'res', filename)
 
     if not os.path.exists(filename) or not os.path.isfile(filename):
         request.invoke_404()
@@ -54,13 +53,5 @@ def request_file(request):
 
     with open(filename) as fl:
         return fl.read()
-
-def index(request):
-    return "<html><body><h1>Welcome!</h1></body></html>"
-
-def error(*args):
-    raise Exception
-
-
 
 

@@ -16,6 +16,7 @@
 #
 
 import views
+import views.api
 
 # HANDLERS - Associate regular-expressions with a handler-function here.
 # Note: This list is modified on server-startup, where it is exchanged
@@ -23,24 +24,21 @@ import views
 #       modify it at runtime, however, make sure to only insert
 #       compiled regular-expressions, not in raw-string format.
 HANDLERS = (
-    ('^/$',                         views.index),
-    ('^/res/([\w\d\-_\./]+)$',      views.request_file),
-    ('^/error/?$',                  views.error),
+
+    # API
+    ('^/api/registered-apps$',      views.api.registered_apps),
+    ('^/api/find-apps$',            views.api.find_apps),
 )
 
 # HANDLE_404 - Handle 404 errors here. It takes a yaaal.request_handler.Request
 # instance as single argument. Note that it's match-slot will be None always.
 HANDLE_404 = None
-def HANDLE_404(request):
-    return "I'm so sorry, but I could not locate the page you are looking for."
 
 # HANDLE_EXCEPTION - Handle an exception that may occure within a
 # handler-function. It takes a yaaal.request_handler.Request instance and the
 # occured exception as arguments. Note that the request's match-slot will be
 # always None. 
 HANDLE_EXCEPTION = None
-def HANDLE_EXCEPTION(request, exc):
-    return "Damn, internal server error... :("
 
 
     
