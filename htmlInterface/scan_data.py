@@ -14,13 +14,10 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-import os
-import ConfigParser
-import json
 
-path = '/usr/share/applications/'
-filelist = os.listdir(path)
-templist = []
+
+PATH = '/usr/share/applications/'
+
 
 
 
@@ -28,17 +25,19 @@ templist = []
 # Get all .desktop files in /usr/share/applications
 ###################################################
 
-for file in filelist:
-	if file[-8:] == ".desktop":
-		templist.append( path + file )
+#import os
+#filelist = os.listdir(path)
 
-filelist = templist
-
+import glob
+filelist = glob.glob(PATH+"/*.desktop")
 
 
 ###################################################
 # Read all config-files
 ###################################################
+
+#import ConfigParser
+#import json
 
 #cfgparser = ConfigParser.RawConfigParser()
 
