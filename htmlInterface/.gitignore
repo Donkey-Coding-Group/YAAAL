@@ -1,0 +1,4 @@
+#ignore local settings file which is created
+#specifically for every user
+
+LOCAL_appdata.xml

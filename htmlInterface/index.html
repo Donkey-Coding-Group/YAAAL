@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>List of installed Applications</h1>
+
+<script type="text/javascript">
+	<!--
+	// Check for the various File API support.
+	if (window.File && window.FileReader && window.FileList && window.Blob) {
+		// Great success! All the File APIs are supported.
+	} else {
+		alert('The File APIs are not fully supported by your browser,\nbut they are needed.');
+	}
+	//-->
+</script>
+
+
+<p id=apps></p>
+<br> <br> <br>
+<p id=status>Nothing happend so far</p>
+
+<button type="button" onclick="loadXML()">Load XML</button>
+
+<script type="text/javascript">
+	<!--
+	function loadXML() {
+		var xmlDoc=document.implementation.createDocument("","",null);
+		xmlDoc.load("LOCAL_appdata.xml");
+		xmlDoc.onload=myFunction
+	}
+	function myFunction() {
+		document.getElementById("status").innerHTML="Sucessfully loaded XML";
+		
+	}
+	//-->
+</script>
+
+</body>
+</html>
