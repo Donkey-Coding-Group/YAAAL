@@ -36,7 +36,7 @@ def parse_desktop_file(filename):
     if not parser.has_section('Desktop Entry'):
         raise ValueError('the file does not contain a `Desktop Entry` section.')
 
-    return parser.items('Desktop Entry')
+    return dict(parser.items('Desktop Entry'))
 
 def parse_for_desktop_files(path):
     """ *Public*. Parse ``*.desktop`` files located in the directory *path*.

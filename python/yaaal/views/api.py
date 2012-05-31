@@ -53,7 +53,7 @@ def find_apps(request):
     data['apps'] = models.Applications.find_all_apps()
 
 
-    return json.dumps(data, sort_keys=True, indent=indent)
+    return json.dumps(data, indent=indent)
         
 
 
