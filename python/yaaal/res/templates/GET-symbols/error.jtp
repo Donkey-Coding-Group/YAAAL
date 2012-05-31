@@ -5,7 +5,7 @@
     </head>
     <body>
         <div class="error">You have to pass <span class="pre">options</span>
-            as GET varibale. Seperate values by <span class="pre">|</span>
+            as GET variable. Seperate values by <span class="pre">|</span>
         </div>
     </body>
 </html>
