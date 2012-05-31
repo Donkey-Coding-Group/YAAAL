@@ -17,14 +17,29 @@
 
 import os
 import sys
-import json
+import jinja2
 
-import models
+import yaaal.util.jinja2    as jutil
+
 from __main__ import __file__ as mainfile
 maindir = os.path.dirname(mainfile)
 
+templates = os.path.join(maindir, 'res', 'templates')
 
+def GET_symbols(request):
+    """ *View*. Loads the 'GET-symbols' template. """
 
+    GETsym_dir = os.path.join(templates, 'GET-symbols')
+
+    options = request.GET.get('options')
+    if not options:
+        filename = 'error.jtp'
+        context = {}
+    else:
+        filename = 'view.jtp'
+        context = {'options': options[0].split('|')}
+
+    return jutil.render_template(os.path.join(GETsym_dir, filename), context)
 
 
 

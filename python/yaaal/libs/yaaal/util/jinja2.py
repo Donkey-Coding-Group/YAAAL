@@ -15,16 +15,20 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-import os
-import sys
-import json
+from __future__ import absolute_import
 
-import models
-from __main__ import __file__ as mainfile
-maindir = os.path.dirname(mainfile)
+import jinja2
 
+def load_template(filename):
+    """ *Public*. Load a :class:`jinja2.Template` by filename. """
 
+    with open(filename) as fl:
+        return jinja2.Template(fl.read())
 
+def render_template(filename, context):
+    """ *Public*. Render a :class:`jinja2.Template` by filename and context. """
 
+    template = load_template(filename)
+    return template.render(**context)
 
 
