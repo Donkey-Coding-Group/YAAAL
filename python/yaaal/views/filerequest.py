@@ -17,6 +17,7 @@
 
 import os
 import sys
+import scss
 import jinja2
 import cStringIO
 
@@ -46,6 +47,11 @@ def cgifile(filename, request):
     finally:
         sys.stdout = stdout
 
+def scssfile(filename):
+    """ *Public*. Returns a compiled Scss file. """
+    with open(filename) as fl:
+        return scss.Scss().compile(fl.read())
+
 def file_request(request):
     """ *View*. Sends the requested file to the client. """
 
@@ -62,6 +68,7 @@ def file_request(request):
     else:
         suffix = None
 
+    data = None
     mime = None
     if suffix in 'css js html htm svg'.split():
         mime = 'text/%s' % suffix
@@ -71,13 +78,20 @@ def file_request(request):
         mime = 'image/%s' % suffix
     elif suffix in 'py pyw'.split():
         return cgifile(filename, request)
+    elif suffix in 'scss '.split():
+        data = scssfile(filename)
+        mime = 'text/css'
     else:
         mime = 'file/%s' % suffix
 
     if mime:
         request.headers['Content-type'] = mime
 
-    with open(filename) as fl:
-        return fl.read()
+    if not data:
+        with open(filename) as fl:
+            return fl.read()
+
+    return data
+
 
 
