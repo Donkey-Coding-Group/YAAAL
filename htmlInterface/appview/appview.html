@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="css/main.css" type="text/css" />
+		<link rel="stylesheet" href="css/appview.css" type="text/css" />
+		<link rel="stylesheet" href="css/appview-options.css" type="text/css" />
+		<script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+		<script src="js/appview.js"></script>
+	</head>
+	<body>
+		<div class="app-content-view" style="position: relative;"><div>
+			<table>
+				<col width="96px">
+				<tr>
+					<td rowspan="2">
+						<img class="app-icon" src="img/python-icon.png" alt="">
+					</td>
+					<td>
+						<span class="app-title">Python 2.7</span>
+						<span class="app-title-path">/usr/bin/python</span>
+					</td>
+					<td>
+						<div class="app-options-icon" onclick="optionsPressed(this, event)"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<span class="app-comment">Interpreter for the Python programming language.</span>
+					</td>
+					<td>
+						<button class="yaaal-btn fr">Run</button>
+					</td>
+				</tr>
+			</table>
+
+			<div class="app-subbar">
+				<div class="app-categories">
+					<span>programming</span>
+					<span>language</span>
+					<span>scripting</span>
+				</div>
+				<div class="app-rating">
+					<ul>
+						<li class="active"></li>
+						<li class="active"></li>
+						<li class="active"></li>
+						<li></li>
+						<li></li>
+				</div>
+			</div>
+			<div class="cl"></div>
+
+			<div class="app-description"><div>
+				Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+			</div></div>
+		</div></div>
+
+		<div id="options" hidden="true" onclick="cancelOptions(this, event);">
+			<div class="opt-content-view" onclick="$.event.fix(event).stopPropagation();"><div>
+				<table>
+					<tr>
+						<td>Name</td>
+						<td><input name="app-name" value="Python 2.7" /></td>
+					</tr>
+					<tr>
+						<td>Executeable</td>
+						<td><input name="app-exec" value="/usr/bin/python" /></td>
+					</tr>
+					<tr>
+						<td>Comment</td>
+						<td><input name="app-comment" value="Interpreter for the Python programming language." /></td>
+					</tr>
+					<tr>
+						<td>Categories</td>
+						<td>
+							<input name="app-categories" value="programming scripting language"/>
+					</tr>
+					<tr>
+						<td>Description</td>
+						<td>
+							<textarea name="app-description">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. </textarea>
+						</td>
+					</tr>
+				</table>
+				<button class="yaaal-btn fl" onclick="cancelOptions(this, event)">Cancel</button>
+				<button class="yaaal-btn fr" onclick="saveOptions(this, event)">Save</button>
+				<div class="cl"></div>
+			</div></div>
+		</div>
+		
+		</body>
+
+</html>

@@ -1,0 +1,108 @@
+<style>
+
+.content-wrapper {
+    width: 800px;
+    margin: auto;
+    border: 1px solid #ddd;
+    font-family: "Sans-serif";
+    background-color: #eee;
+    box-shadow: 0 0 4px #ddd;
+}
+.content-wrapper>div {
+    padding: 1em;
+}
+
+.app-icon {
+    width: 128px;
+    height: 128px;
+    padding: 0;
+    margin: 0;
+    margin-right: 1em;
+    border-radius: 10px;
+    float: left;
+}
+.app-title {
+    margin: 1em 0 0.5em;
+    font-weight: bold;
+    display: block;
+    font-size: 200%;
+    color: #333;
+    text-shadow: 1px 1px 3px #ddd;
+}
+.app-description-short {
+    font-style: italic;
+    font-size: 90%;
+    font-family: "Arial";
+    color: #aaa;
+}
+.app-description-long {
+    margin: 2em 0 1em;
+    font-family: "Garamond";
+    font-size: 14px;
+    color: #333;
+}
+.app-rating {
+    margin-top: 1em;
+    float: right;
+}
+.app-rating ul {
+    padding: 0;
+    margin: 0;
+}
+.app-rating ul li {
+    list-style: none;
+    width: 24px;
+    height: 24px;
+    float: left;
+    margin: 0 0.2em;
+    background-color: #ddd;
+    border-radius: 30px;
+}
+.app-rating ul li.active {
+    background-color: #ec7;
+}
+.app-rating ul li span {
+    display: block;
+    padding-left: 8px;
+    padding-top: 4px;
+    color: #333;
+    font-size: 12px;
+}
+.app-button-run {
+    display: block;
+    width: 80px;
+    height: 30px;
+    float: right;
+}
+.app-options {
+    width: 20px;
+    height: 20px;
+}
+
+.cl {
+    clear: both;
+}
+</style>
+
+<div class="content-wrapper"><div>
+
+    <img class="app-icon" src="/usr/share/icons/Humanity/apps/48/gksu-root-terminal.svg" alt="">
+    <div class="app-rating">
+        <ul>
+            <li class="active"><span>1</span></li>
+            <li class="active"><span>2</span></li>
+            <li><span>3</span></li>
+            <li><span>4</span></li>
+            <li><span>5</span></li>
+        </ul>
+    </div>
+    <span class="app-title">Python 2.7 <img class="app-options" src="/home/niklas/Downloads/gear.png" alt="" height="32px"></span>
+    <span class="app-description-short">Interpreter for the Python language.</span>
+    <button class="app-button-run">Run</button>
+    <div class="cl"></div>
+
+    <div class="app-description-long"><div>
+        Python is an easy scripting language. The Python 2.7 Interpreter is implemented in C and therefore also called CPython.
+    </div></div>
+
+</div></div>
