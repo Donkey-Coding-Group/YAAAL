@@ -21,8 +21,8 @@ If Seed is not available in your repos, you
 can get seed from Gnome's git repository.
   
   
-===========+====================================
-Browse:	   |http://git.gnome.org/browse/seed
-===========+====================================
-Get:       |git clone git://git.gnome.org/seed
-===========+====================================
++===========+====================================+
+|Browse:    |http://git.gnome.org/browse/seed    |
++===========+====================================+
+|Get:       |git clone git://git.gnome.org/seed  |
++===========+====================================+
