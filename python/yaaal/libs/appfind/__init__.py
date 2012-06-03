@@ -296,15 +296,18 @@ def parse_desktop_file(filename, pixmaps, ):
     data = dict(parser.items('Desktop Entry'))
 
     try:
-       result = {
-            'name':         data['name'],
-            'exec':         DKENTRY_EXECREPL.sub('', data['exec']),
-            'type':         data['type'],
-            'version':      float(data.get('version', 1.0)),
-            'encoding':     data.get('encoding', 'utf-8'),
-            'comment':      data.get('comment', None),
-            'categories':   _filter_bool(data.get('categories', '').split(';')),
-            'mimetypes':    _filter_bool(data.get('mimetype', '').split(';')),
+        encoding = data.get('encoding', 'utf-8')
+        result = {
+            'name':       data['name'].decode(encoding),
+            'exec':       DKENTRY_EXECREPL.sub('', data['exec']).decode(encoding),
+            'type':       data['type'].decode(encoding),
+            'version':    float(data.get('version', 1.0)),
+            'encoding':   encoding,
+            'comment':    data.get('comment', '').decode(encoding) or None,
+            'categories': _filter_bool(data.get('categories', '').
+                                            decode(encoding).split(';')),
+            'mimetypes':  _filter_bool(data.get('mimetype', '').
+                                            decode(encoding).split(';')),
         }
     except KeyError as exc:
         raise TypeError('file is not a valid *.desktop file. missing item ' +
@@ -323,7 +326,7 @@ def parse_desktop_file(filename, pixmaps, ):
                         'NoDisplay is not true/false but %r.' % nodisplay)
         
 
-    icon = data.get('icon', None)
+    icon = data.get('icon', '').decode(encoding) or None
     if icon:
         if os.path.isabs(icon):
             pass
@@ -357,7 +360,7 @@ def find(search_dirs=None, pixmaps=None, max_depth=-1):
         pixmaps_ = find_all_pixmaps()
         pixmaps  = {}
         for k, v in pixmaps_.iteritems():
-            pixmaps[k] = max(v, key=lambda x: os.stat(x.fullname).st_size)
+            pixmaps[k] = max(v, key=lambda x: x.size)
 
     if not search_dirs:
         search_dirs = APPLICATION_PATHS
