@@ -1,0 +1,48 @@
+
+#options {
+	position: absolute;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.2);
+}
+.opt-content-view {
+	width: 700px;
+	margin: 2em auto;
+	background-color: #ddd;
+	border: 1px solid #eee;
+	border-radius: 10px;
+	box-shadow: 0 0 4px #999;
+}
+.opt-content-view > div {
+	padding: 1em;
+}
+.opt-content-view > div table {
+	font: 14px "Arial";
+	table-layout: fixed;
+}
+.opt-content-view > div table td:first-child {
+	width: 130px;
+	color: #555;
+	text-shadow: 0px 1px #fff;
+}
+.opt-content-view > div table td:last-child {
+	width: 520px;
+}
+.opt-content-view input {
+	padding: 0.2em 0em;
+	width: 100%;
+	height: 1.5em;
+	font-size: 16px "Arial";
+	border: 1px solid #ccc;
+	background-color: #f4f4f4;
+	box-shadow: inset 1px 2px 2px #ddd;
+	color: #555;
+	text-shadow: 0px 1px #fff;
+	border-radius: 2px;
+}
+.opt-content-view textarea {
+	width: 100%;
+	min-height: 200px;
+}

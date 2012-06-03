@@ -1,0 +1,88 @@
+
+.app-content-view {
+	width: 800px;
+	margin: auto;
+	background-color: #eee;
+	color: #333;
+	border: 1px solid #ccc;
+	box-shadow: 0 0 3px #eee;
+	border-radius: 2px;
+}
+.app-content-view > div {
+	padding: 1em;
+}
+.app-content-view > div > table {
+	width: 100%;
+}
+.app-content-view > div > table > td:first-child {
+	table-layout: fixed;
+}
+.app-icon {
+	width: 96px;
+}
+.app-title {
+	font: 2em "Arial", "sans-serif";
+	font-weight: bold;
+}
+.app-title-path {
+	font: 0.8em "Arial";
+	font-style: italic;
+	color: #aaa;
+}
+.app-comment {
+	font: 1em "Arial", "sans-serif";
+	font-style: italic;
+	color: #777;
+}
+.app-description {
+	margin: 1em 0 0.5em;
+	font: 16px/1.4 "Georgia";
+	color: #444;
+}
+.app-categories {
+	margin: 0.9em 0 0.2em;
+	font: 12px "Arial";
+	color: #555;
+	float: left;
+}
+.app-categories > span {
+	margin-right: 0.3em;
+	padding: 2px 4px;
+	background-color: #ddd;
+	border: 1px solid #bbb;
+}
+.app-categories > span:hover {
+	background-color: #eee;
+	cursor: pointer;
+}
+.app-options-icon {
+	background-image: url("../img/gnome-options.png");
+	width: 24px;
+	height: 24px;
+	display: block;
+	float: right;
+}
+.app-options-icon:hover {
+	background-image: url("../img/gnome-options-hover.png");
+	cursor: pointer;
+}
+.app-rating > ul {
+	padding: 0.2em 0 0 0;
+	margin: 0;
+	float: right;
+}
+.app-rating > ul > li {
+	list-style: none;
+	width: 22px;
+	height: 22px;
+	margin: 0.2em;
+	float: left;
+	display: block;
+	background-image: url("../img/rating-star.png");
+}
+.app-rating > ul > li.active {
+	background-image: url("../img/rating-star-active.png");
+}
+
+
+

@@ -1,0 +1,23 @@
+.yaaal-btn {
+	padding: 0.3em 1.5em;
+	background-image: -moz-linear-gradient(top, #f4f4f4, #e4e4e4);
+	border: 1px solid #aaa;
+	border-radius: 3px;
+}
+.yaaal-btn:hover {
+	border-color: #3af;
+	box-shadow: 0 0 2px #ddd;
+}
+.yaaal-btn:active {
+	box-shadow: 0 0 2px #ddd, inset 1px 2px 2px #ccc;
+}
+
+.fl {
+	float: left;
+}
+.fr {
+	float: right;
+}
+.cl {
+	clear: both;
+}
