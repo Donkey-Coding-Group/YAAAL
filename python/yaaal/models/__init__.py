@@ -15,18 +15,4 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-import appparse
-
-class Applications(object):
-    """ *Public*. Provides methods for parsing application data. """
-
-    @ classmethod
-    def get_registered_apps(cls):
-        return {}
-
-    @ classmethod
-    def find_all_apps(cls):
-        return appparse.parse_for_desktop_files('/usr/share/applications')
-
-
 

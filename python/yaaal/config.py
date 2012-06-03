@@ -17,8 +17,8 @@
 
 import views
 import views.api
+import views.gui
 import views.filerequest
-import views.jinja2test
 
 # HANDLERS - Associate regular-expressions with a handler-function here.
 # Note: This list is modified on server-startup, where it is exchanged
@@ -27,10 +27,16 @@ import views.jinja2test
 #       compiled regular-expressions, not in raw-string format.
 HANDLERS = (
     # FILE REQUEST
-    ('^/res/([\w\d\-\._/]+)$',       views.filerequest.file_request),
+    ('^/res/([\w\d\-\._/]+)$',          views.filerequest.res_request),
+    ('^/file-request/([\w\d\-\._/]+)$', views.filerequest.file_request),
 
-    # JINJA2 TESTS
-    ('^/jinja-test/GET-symbols/$',   views.jinja2test.GET_symbols),
+    # GUI
+    ('^/applist$',                  views.gui.applist),
+    ('^/appfind$',                  views.gui.appfind),
+
+    # API
+    ('^/api/add-app/(\d+)$',        views.api.add_app),
+    ('^/api/rm-app/(\d+)$',         views.api.rm_app),
 )
 
 # HANDLE_404 - Handle 404 errors here. It takes a yaaal.request_handler.Request

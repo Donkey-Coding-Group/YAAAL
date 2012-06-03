@@ -357,7 +357,7 @@ def find(search_dirs=None, pixmaps=None, max_depth=-1):
         pixmaps_ = find_all_pixmaps()
         pixmaps  = {}
         for k, v in pixmaps_.iteritems():
-            pixmaps[k] = max(v, key=lambda x: x.size)
+            pixmaps[k] = max(v, key=lambda x: os.stat(x.fullname).st_size)
 
     if not search_dirs:
         search_dirs = APPLICATION_PATHS

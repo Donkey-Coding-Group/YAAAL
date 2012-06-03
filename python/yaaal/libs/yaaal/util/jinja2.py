@@ -18,12 +18,13 @@
 from __future__ import absolute_import
 
 import jinja2
+import codecs
 
 def load_template(filename):
     """ *Public*. Load a :class:`jinja2.Template` by filename. """
 
     with open(filename) as fl:
-        return jinja2.Template(fl.read())
+        return jinja2.Template(fl.read().encode('utf-8'))
 
 def render_template(filename, context):
     """ *Public*. Render a :class:`jinja2.Template` by filename and context. """
