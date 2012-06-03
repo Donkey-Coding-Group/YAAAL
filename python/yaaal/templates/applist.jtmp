@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="/res/css/applist.css" type="text/css" />
+        <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+        <script src="/res/js/appfind.js"></script>
+    </head>
+    <body>
+        <div class="applist-mainframe"><div>
+            <div class="applist-info">
+                <span>Number of applications:</span>
+                <spanc class="applist-num">{{ apps|length }}</span>
+            </div>
+            {% for app in apps %}
+                <div class="applist-item" id="app-{{app['index']}}"><div>
+                    <span class="app-title">{{ app['name'] }}</span>
+                    <img class="app-icon" width="64px" src="/file-request/{{app['icon']}}" alt="Image Here!" />
+                    <span class="app-comment">
+                        {% if app['comment'] %}
+                            {{ app['comment'] }}
+                        {% else %}
+                            No comment.
+                        {% endif %}
+                    </span>
+
+                    {% if addable %}
+                        <button class="app-add-btn" app-index="{{ app['index'] }}">Add</button>
+                    {% else %}
+                        <button class="app-rm-btn" app-index="{{ app['index'] }}">Remove</button>
+                    {% endif %}
+
+                    <div class="cl"></div>
+                </div></div>
+            {% endfor %}
+        </div></div>
+    </body>
+</html>
+

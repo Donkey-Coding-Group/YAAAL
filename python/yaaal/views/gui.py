@@ -17,29 +17,25 @@
 
 import os
 import sys
-import jinja2
-
-import yaaal.util.jinja2    as jutil
 
 from __main__ import __file__ as mainfile
 maindir = os.path.dirname(mainfile)
 
-templates = os.path.join(maindir, 'res', 'templates')
+import yaaal.util.jinja2   as jutils
+import models.applications as apps
 
-def GET_symbols(request):
-    """ *View*. Loads the 'GET-symbols' template. """
 
-    GETsym_dir = os.path.join(templates, 'GET-symbols')
+def applist(request):
+    template = os.path.join(maindir, 'templates', 'applist.jtmp')
+    apps_ = apps.get_registered_applications().values()
+    return jutils.render_template(template, {'apps':apps_, 'addable':False})
 
-    options = request.GET.get('options')
-    if not options:
-        filename = 'error.jtp'
-        context = {}
-    else:
-        filename = 'view.jtp'
-        context = {'options': options[0].split('|')}
 
-    return jutil.render_template(os.path.join(GETsym_dir, filename), context)
+def appfind(request):
+    template = os.path.join(maindir, 'templates', 'applist.jtmp')
+    apps_ = apps.get_found_apps().values()
+    return jutils.render_template(template, {'apps':apps_, 'addable':True})
+
 
 
 

@@ -19,11 +19,36 @@ import os
 import sys
 import json
 
-import models
 from __main__ import __file__ as mainfile
 maindir = os.path.dirname(mainfile)
 
+import models.applications as apps
 
+
+def add_app(request):
+    """ Adds an application by index (sent per URI) to the registered
+        applications. """
+
+    found_apps = apps.get_found_apps()
+    index = int(request.match.group(1))
+
+    if index not in found_apps:
+        return '{"status": "INVALID_INDEX"}'
+
+    id = apps.register_application(found_apps.pop(index))
+    return '{"status": "OK"}'
+
+
+def rm_app(request):
+    """ Removes an entry from the registered applications. """
+
+    index = int(request.match.group(1))
+    appdata = apps.unregister_application(index)
+    if not appdata:
+        return '{"status": "INVALID_INDEX"}'
+
+    apps.put_app_back(appdata)
+    return '{"status": "OK"}'
 
 
 

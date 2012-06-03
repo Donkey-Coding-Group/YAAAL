@@ -1,0 +1,46 @@
+.applist-mainframe {
+    width: 800px;
+    margin: auto;
+    background-color: #eee;
+    box-shadow: 0 0 4px #ccc;
+    border: 1px solid #ddd;
+    border-top: 4px solid #69a;
+}
+.applist-mainframe > div {
+    padding: 1em;
+}
+.applist-info {
+    margin: 0.3em 0 1em 0;
+    font: 13px "Arial";
+    color: #235;
+}
+.applist-item {
+    padding: 1em 1em;
+    background-color: #e8e8e8;
+    border-bottom: 1px solid #ccc;
+}
+.applist-item:nth-child(2n) {
+    background-color: #e4e4e4;
+}
+.applist-item:hover {
+    background-color: #EDE6D5;
+    cursor: pointer;
+}
+.app-title {
+    display: block;
+    font-size: 1em;
+    font-weight: bold;
+}
+.app-comment {
+    color: #888;
+    font-family: "Arial";
+    font-style: italic;
+}
+.app-icon {
+    float: right;
+}
+
+
+.cl {
+    clear: both;
+}

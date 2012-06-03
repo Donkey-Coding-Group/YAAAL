@@ -52,9 +52,13 @@ def scssfile(filename):
     with open(filename) as fl:
         return scss.Scss().compile(fl.read())
 
-def file_request(request):
-    """ *View*. Sends the requested file to the client. """
+def res_request(request):
+    """ *View*. Sends the requested file from the `res` folderto the
+        client. """
 
+    return file_request(request, os.path.join(maindir, 'res'), True)
+
+    """
     filename = request.match.group(1)
     filename = os.path.join(maindir, 'res', filename)
 
@@ -92,6 +96,63 @@ def file_request(request):
             return fl.read()
 
     return data
+    """
 
+def file_request(request, rel_path=None, cgi=False):
+    """ *view*. Sends any requested file to the client. """
+
+    filename = request.match.group(1)
+    if rel_path:
+        filename = os.path.join(rel_path, filename)
+    elif not os.path.isabs(filename):
+        request.invoke_404()
+        return
+
+    if not os.path.exists(filename) or not os.path.isfile(filename):
+        request.invoke_404()
+        return
+
+    suffix = filename.rfind('.')
+    if suffix >= 0:
+        suffix = filename[suffix + 1:]
+    else:
+        suffix = None
+
+    data = None
+    mime = None
+    if suffix in 'css js html htm'.split():
+        mime = 'text/%s' % suffix
+    elif suffix in 'txt '.split():
+        mime = 'text/plain'
+    elif suffix in 'jpg jpeg png tif tiff gif':
+        mime = 'image/%s' % suffix
+    elif suffix in 'svg '.split():
+        mime = 'image/%s+xml' % suffix
+    elif suffix in 'py pyw'.split():
+        if cgi:
+            return cgifile(filename, request)
+        else:
+            with open(filename) as fl:
+                data = fl.read()
+            mime = 'text/plain'
+    elif suffix in 'scss '.split():
+        if cgi:
+            data = scssfile(filename)
+            mime = 'text/css'
+        else:
+            with open(filename) as fl:
+                data = fl.read()
+            mime = 'file/scss'
+    else:
+        mime = 'file/%s' % suffix
+
+    if mime:
+        request.headers['Content-type'] = mime
+
+    if not data:
+        with open(filename) as fl:
+            data = fl.read()
+
+    return data
 
 
