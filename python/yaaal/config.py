@@ -27,7 +27,7 @@ import views.jinja2test
 #       compiled regular-expressions, not in raw-string format.
 HANDLERS = (
     # FILE REQUEST
-    ('^/res/([\w\d\-\._/]+)$',      views.filerequest.file_request),
+    ('^/res/([\w\d\-\._/]+)$',       views.filerequest.file_request),
 
     # JINJA2 TESTS
     ('^/jinja-test/GET-symbols/$',   views.jinja2test.GET_symbols),
