@@ -324,7 +324,6 @@ def parse_desktop_file(filename, pixmaps, ):
     else:
         raise TypeError('file is not a valid *.desktop file. value for ' +
                         'NoDisplay is not true/false but %r.' % nodisplay)
-        
 
     icon = data.get('icon', '').decode(encoding) or None
     if icon:

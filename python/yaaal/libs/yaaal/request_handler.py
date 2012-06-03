@@ -254,7 +254,7 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         if hasattr(result, 'read'):
             result = result.read()
 
-        self.wfile.write(result)
+        self.wfile.write(result.decode('utf-8'))
 
     def add_handler(self, regex, handler, flags=0):
         """ *Public*. Associate a regular-expression passed via *regex* with a
